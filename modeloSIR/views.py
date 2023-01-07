@@ -11,25 +11,14 @@ import base64
 # Create your views here.
 def home(request):
     taxas = {}
-    N = request.GET.get("qtd_populacao", 500000)
-    I = request.GET.get("qtd_infectados", 1)
-    beta = request.GET.get("taxa_infeccao", 0.0000003)
-    gama = request.GET.get("taxa_recuperacao", 0.1)
-    m = request.GET.get("taxa_morte", 0.015)
+    N = int(request.GET.get("qtd_populacao", 500000))
+    I = int(request.GET.get("qtd_infectados", 1))
+    beta = float(request.GET.get("taxa_infeccao", 3e-7))
+    gama = float(request.GET.get("taxa_recuperacao", 0.1))
+    m = float(request.GET.get("taxa_morte", 0.0015))
     if (I > N):
-        print("invalido")
-    # grafica(beta, gama, m, N, I)
-    return render(request, 'index.html', {
-        "taxas": taxas
-    })
-
-def test(request):
-    plt.plot(range(10))
-    fig = plt.gcf()
-    flike = io.BytesIO()
-    fig.savefig(flike)
-    b64 = base64.b64encode(flike.getvalue()).decode()
-    return render(request, 'result/result.html', {'data': b64})
+        return render(request, 'result/error.html')
+    return grafico(beta, gama, m, N, I, request)
 
 def RK4(tk, xk, h, F):
     """
@@ -95,34 +84,24 @@ def simulacao(tMax, x0, h, beta, gama, m):
 
     return t, x
 
-def plot(axs, t, x):
-    axs[0].plot(t, x[0,:])
-    axs[1].plot(t, x[1,:])
-    axs[2].plot(t, x[2,:])
-    axs[3].plot(t, x[3,:])
-
-def grafica(beta, gama, m, N, I):
-    axs = []
-    for i in range(4):
-        fig, ax = plt.subplots(figsize=(10,7))
-        axs.append(ax)
-
-    axs[0].set_title("População Suscetível (S)")
-    axs[1].set_title("População Infectada (I)")
-    axs[2].set_title("População Recuperada (R)")
-    axs[3].set_title("População Morta (M)")
-
+def grafico(beta, gama, m, N, I, request):
+    fig, ax = plt.subplots(figsize=(10,7))
     tMax = 1000
     x0 = np.array([N-I, I, 0, 0])
     h = 0.1
 
     t, x = simulacao(tMax, x0, h, beta, gama, m)
-    plot(axs, t, x, "")
+    ax.plot(t, x[0,:], label="População Suscetível (S)")
+    ax.plot(t, x[1,:], label="População Infectada (I)")
+    ax.plot(t, x[2,:], label="População Recuperada (R)")
+    ax.plot(t, x[3,:], label="População Morta (M)")
 
-    for ax in axs:
-        ax.legend()
-        ax.set_xlabel("Dias")
-        ax.set_ylabel("Nº Pessoas")
-        ax.grid()
+    ax.legend()
+    ax.set_xlabel("Dias")
+    ax.set_ylabel("Nº Pessoas")
+    ax.grid()
 
-    plt.show()
+    flike = io.BytesIO()
+    fig.savefig(flike)
+    b64 = base64.b64encode(flike.getvalue()).decode()
+    return render(request, 'result/result.html', {'data': b64})

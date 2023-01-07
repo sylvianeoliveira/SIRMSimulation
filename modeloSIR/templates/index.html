@@ -40,9 +40,12 @@
       <form>
           <input type="number" class="form-control" placeholder="Insira o tamanho da sua população. Ex.: 500000" value="{{ taxas.qtd_populacao }}" name="qtd_populacao" aria-label="qtd_populacao" aria-describedby="button-addon2" min=10 required>
           <input type="number" class="form-control" placeholder="Insira o número de pessoas inicialmente infectadas. Ex.: 1" value="{{ taxas.qtd_infectados }}" name="qtd_infectados" aria-label="qtd_infectados" aria-describedby="button-addon2" min=1 required>
-          <input type="number" step="any" class="form-control" placeholder="Insira a sua taxa de infecção. Ex.: 0.0000003" value="{{ taxas.taxa_infeccao }}" name="taxa_infeccao" aria-label="taxa_infeccao" aria-describedby="button-addon2" min=0 required>
+          <input type="number" step="any" class="form-control" placeholder="Insira a sua taxa de infecção. Ex.: 3e-7" value="{{ taxas.taxa_infeccao }}" name="taxa_infeccao" aria-label="taxa_infeccao" aria-describedby="button-addon2" min=0 required>
           <input type="number" step="any" class="form-control" placeholder="Insira a sua taxa de recuperação. Ex.: 0.1" value="{{ taxas.taxa_recuperacao }}" name="taxa_recuperacao" aria-label="taxa_recuperacao" aria-describedby="button-addon2" min=0 required>
           <input type="number" step="any" class="form-control" placeholder="Insira a sua taxa mortalidade. Ex.: 0.0015" value="{{ taxas.taxa_morte }}" name="taxa_morte" aria-label="taxa_morte" aria-describedby="button-addon2" min=0 required>
+          <div class="alert alert-warning" role="alert">
+            Obs.: Para ter resultados relevantes, o produto da taxa de infecção pelo tamanho da população deve ser da mesma ordem de grandeza que a taxa de recuperação.
+          </div>
           <center>
             <button type="submit" class="btn btn-success btn-lg btn-block" >Enviar</button>
           </center>
